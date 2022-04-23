@@ -71,12 +71,12 @@ func (vc *Vec[T]) PopFront() (e T) {
 	return
 }
 
-func (vc *Vec[T]) Len() int {
-	return len(*vc)
+func (vc Vec[T]) Len() int {
+	return len(vc)
 }
 
-func (vc *Vec[T]) Cap() int {
-	return cap(*vc)
+func (vc Vec[T]) Cap() int {
+	return cap(vc)
 }
 
 type CompareFunc[T any] func(T) bool
