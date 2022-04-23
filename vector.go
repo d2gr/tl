@@ -13,8 +13,8 @@ func MakeVecSize[T any](size, capacity int) Vec[T] {
 	return (Vec[T])(make([]T, size, capacity))
 }
 
-func (vc *Vec[T]) Get(i int) T {
-	return (*vc)[i]
+func (vc Vec[T]) Get(i int) T {
+	return vc[i]
 }
 
 func (vc *Vec[T]) Resize(n int) {
@@ -37,20 +37,20 @@ func (vc *Vec[T]) Push(elmnts ...T) {
 	copy(*vc, elmnts)
 }
 
-func (vc *Vec[T]) Front() T {
-	return (*vc)[0]
+func (vc Vec[T]) Front() T {
+	return vc[0]
 }
 
-func (vc *Vec[T]) FrontPtr() *T {
-	return &(*vc)[0]
+func (vc Vec[T]) FrontPtr() *T {
+	return &vc[0]
 }
 
-func (vc *Vec[T]) Back() T {
-	return (*vc)[vc.Len()-1]
+func (vc Vec[T]) Back() T {
+	return vc[vc.Len()-1]
 }
 
-func (vc *Vec[T]) BackPtr() *T {
-	return &(*vc)[vc.Len()-1]
+func (vc Vec[T]) BackPtr() *T {
+	return &vc[vc.Len()-1]
 }
 
 func (vc *Vec[T]) PopBack() (e T) {
