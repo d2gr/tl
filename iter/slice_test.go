@@ -12,9 +12,9 @@ func TestSlice(t *testing.T) {
 				return n > 2
 			},
 		), 0,
-	).Get()
+	)
 
-	if res != 3 {
-		t.Fatalf("differs: %v <> %v", res, 3)
+	if !res.Next() && res.Get() != 3 {
+		t.Fatalf("differs: %v <> %v", res.Get(), 3)
 	}
 }
