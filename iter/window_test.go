@@ -1,12 +1,19 @@
 package iter
 
 import (
-	"fmt"
+	"reflect"
 	"testing"
 )
 
 func TestWindow(t *testing.T) {
-	iter := ToSlice(WindowCopy(Slice([]int{1, 2, 3, 4, 5, 6, 7}), 2))
+	res := ToSlice(WindowCopy(Slice([]int{1, 2, 3, 4, 5}), 2))
 
-	fmt.Println(iter)
+	if !reflect.DeepEqual(res, [][]int{
+		{1, 2},
+		{2, 3},
+		{3, 4},
+		{4, 5},
+	}) {
+		t.Fatalf("Unexpected: %v", res)
+	}
 }
