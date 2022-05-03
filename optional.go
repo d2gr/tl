@@ -5,7 +5,12 @@ type Optional[T any] struct {
 	hasValue bool
 }
 
-func MakeOptional[T any](v *T) (opt Optional[T]) {
+func MakeOptional[T any](v T) (opt Optional[T]) {
+	opt.Set(v)
+	return opt
+}
+
+func NewOptional[T any](v *T) (opt Optional[T]) {
 	if v != nil {
 		opt.Set(*v)
 	}

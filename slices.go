@@ -1,8 +1,28 @@
 package tl
 
 func Contains[T comparable](vs []T, e T) bool {
-	for _, v := range vs {
-		if v == e {
+	for i := range vs {
+		if vs[i] == e {
+			return true
+		}
+	}
+
+	return false
+}
+
+func SearchFn[T any](vs []T, cmpFn CompareFunc[T]) int {
+	for i := range vs {
+		if cmpFn(vs[i]) {
+			return i
+		}
+	}
+
+	return -1
+}
+
+func ContainsFn[T any](vs []T, cmpFn CompareFunc[T]) bool {
+	for i := range vs {
+		if cmpFn(vs[i]) {
 			return true
 		}
 	}
