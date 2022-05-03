@@ -5,3 +5,8 @@ type Iter[T any] interface {
 	Get() T
 	GetPtr() *T
 }
+
+func Advance[T any](iter Iter[T], count int) {
+	for i := 0; i < count && iter.Next(); i++ {
+	}
+}

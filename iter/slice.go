@@ -49,10 +49,10 @@ func ToSlice[T any](iter Iter[T]) []T {
 	return newSlice
 }
 
-func Nth[T any](iter Iter[T], nth int) *T {
+func Nth[T any](iter Iter[T], nth int) Iter[T] {
 	for iter.Next() && nth != 0 {
 		nth--
 	}
 
-	return iter.GetPtr()
+	return iter
 }
