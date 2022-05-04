@@ -30,7 +30,7 @@ func ContainsFn[T any](vs []T, cmpFn CompareFunc[T]) bool {
 	return false
 }
 
-func ExtractFrom[T, E any](set []T, fn func(T) E) []E {
+func Map[T, E any](set []T, fn func(T) E) []E {
 	r := make([]E, len(set))
 	for i := range set {
 		r[i] = fn(set[i])
