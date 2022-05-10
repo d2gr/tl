@@ -11,6 +11,10 @@ type List[T any] struct {
 	size int
 }
 
+func (list *List[T]) Size() int {
+	return list.size
+}
+
 func (list *List[T]) PushBack(v T) {
 	e := &listElement[T]{
 		value: v,
@@ -29,6 +33,7 @@ func (list *List[T]) PushBack(v T) {
 	}
 
 	list.root.prev = e
+	list.size++
 }
 
 func (list *List[T]) PushFront(v T) {
@@ -49,12 +54,34 @@ func (list *List[T]) PushFront(v T) {
 	}
 
 	list.root.next = e
+	list.size++
 }
 
 func (list *List[T]) PopFront() (opt OptionalPtr[T]) {
 	if list.root.next != nil {
 		opt.Set(&list.root.next.value)
+
 		list.root.next = list.root.next.next
+
+		list.size--
+		if list.size == 0 {
+			list.root.prev = nil
+		}
+	}
+
+	return
+}
+
+func (list *List[T]) PopBack() (opt OptionalPtr[T]) {
+	if list.root.prev != nil {
+		opt.Set(&list.root.prev.value)
+
+		list.root.prev = list.root.prev.prev
+
+		list.size--
+		if list.size == 0 {
+			list.root.next = nil
+		}
 	}
 
 	return
@@ -63,6 +90,7 @@ func (list *List[T]) PopFront() (opt OptionalPtr[T]) {
 func (list *List[T]) Reset() {
 	list.root.next = nil
 	list.root.prev = nil
+	list.size = 0
 }
 
 type forwardIterList[T any] struct {
@@ -78,7 +106,7 @@ func (list *List[T]) ForwardIter() Iter[T] {
 }
 
 func (iter *forwardIterList[T]) Next() bool {
-	cond := iter.root != iter.next.next
+	cond := iter.root != iter.next.next && iter.next.next != nil
 	iter.next = iter.next.next
 	return cond
 }
@@ -104,7 +132,7 @@ func (list *List[T]) ReverseIter() Iter[T] {
 }
 
 func (iter *reverseIterList[T]) Next() bool {
-	cond := iter.root != iter.next.prev
+	cond := iter.root != iter.next.prev && iter.next.prev != nil
 	iter.next = iter.next.prev
 	return cond
 }

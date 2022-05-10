@@ -55,3 +55,52 @@ func TestList(t *testing.T) {
 		list.Reset()
 	}
 }
+
+func TestListPop(t *testing.T) {
+	var list tl.List[int]
+
+	type expectedValue struct {
+		fn       func(int)
+		iter     func() tl.Iter[int]
+		expected []int
+	}
+
+	iter := list.ForwardIter()
+	if iter.Next() {
+		t.Fatal("unexpected")
+	}
+
+	iter = list.ReverseIter()
+	if iter.Next() {
+		t.Fatal("unexpected")
+	}
+
+	{
+		list.PushBack(2)
+		list.PopFront()
+
+		iter = list.ForwardIter()
+		if iter.Next() {
+			t.Fatal("unexpected")
+		}
+
+		iter = list.ReverseIter()
+		if iter.Next() {
+			t.Fatal("unexpected")
+		}
+	}
+	{
+		list.PushFront(2)
+		list.PopBack()
+
+		iter := list.ForwardIter()
+		if iter.Next() {
+			t.Fatal("unexpected")
+		}
+
+		iter = list.ReverseIter()
+		if iter.Next() {
+			t.Fatal("unexpected")
+		}
+	}
+}
