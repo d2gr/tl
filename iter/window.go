@@ -1,9 +1,11 @@
 package iter
 
+import "github.com/d2gr/tl"
+
 type iterWindow[T any] struct {
 	size  int
 	win   []T
-	inner Iter[T]
+	inner tl.Iter[T]
 }
 
 func (iter *iterWindow[T]) Next() bool {
@@ -30,7 +32,7 @@ func (iter *iterWindow[T]) GetPtr() *[]T {
 	return &iter.win
 }
 
-func Window[T any](inner Iter[T], n int) Iter[[]T] {
+func Window[T any](inner tl.Iter[T], n int) tl.Iter[[]T] {
 	return &iterWindow[T]{
 		inner: inner,
 		win:   make([]T, 0, n),

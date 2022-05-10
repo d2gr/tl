@@ -3,7 +3,7 @@ package iter
 import "github.com/d2gr/tl"
 
 type iterFilter[T any] struct {
-	inner Iter[T]
+	inner tl.Iter[T]
 	fn    tl.CompareFunc[T]
 }
 
@@ -25,7 +25,7 @@ func (iter *iterFilter[T]) GetPtr() *T {
 	return iter.inner.GetPtr()
 }
 
-func Filter[T any](inner Iter[T], fn tl.CompareFunc[T]) Iter[T] {
+func Filter[T any](inner tl.Iter[T], fn tl.CompareFunc[T]) tl.Iter[T] {
 	return &iterFilter[T]{
 		inner: inner,
 		fn:    fn,

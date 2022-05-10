@@ -1,5 +1,7 @@
 package iter
 
+import "github.com/d2gr/tl"
+
 type iterWindowSlice[T any] struct {
 	size int
 	win  []T
@@ -25,7 +27,7 @@ func (iter *iterWindowSlice[T]) GetPtr() *[]T {
 	return &iter.win
 }
 
-func WindowSlice[T any](vs []T, n int) Iter[[]T] {
+func WindowSlice[T any](vs []T, n int) tl.Iter[[]T] {
 	return &iterWindowSlice[T]{
 		vs:   vs,
 		size: n,

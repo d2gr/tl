@@ -1,8 +1,10 @@
 package iter
 
+import "github.com/d2gr/tl"
+
 type iterMap[T, V any] struct {
 	current V
-	inner   Iter[T]
+	inner   tl.Iter[T]
 	conv    func(T) V
 }
 
@@ -24,7 +26,7 @@ func (iter *iterMap[T, V]) GetPtr() *V {
 	return &iter.current
 }
 
-func Map[T, V any](inner Iter[T], conv func(T) V) Iter[V] {
+func Map[T, V any](inner tl.Iter[T], conv func(T) V) tl.Iter[V] {
 	return &iterMap[T, V]{
 		inner: inner,
 		conv:  conv,

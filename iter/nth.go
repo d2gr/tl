@@ -1,7 +1,9 @@
 package iter
 
+import "github.com/d2gr/tl"
+
 type iterNth[T any] struct {
-	inner Iter[T]
+	inner tl.Iter[T]
 	val   *T
 }
 
@@ -24,7 +26,7 @@ func (iter *iterNth[T]) GetPtr() *T {
 	return iter.val
 }
 
-func Nth[T any](inner Iter[T], nth int) Iter[T] {
+func Nth[T any](inner tl.Iter[T], nth int) tl.Iter[T] {
 	for nth != 0 {
 		nth--
 		inner.Next()

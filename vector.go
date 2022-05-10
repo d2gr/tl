@@ -37,34 +37,33 @@ func (vc *Vec[T]) Push(elmnts ...T) {
 	copy(*vc, elmnts)
 }
 
-func (vc Vec[T]) Front() T {
-	return vc[0]
+func (vc Vec[T]) Front() (opt OptionalPtr[T]) {
+	if len(vc) != 0 {
+		opt.Set(&vc[0])
+	}
+	return opt
 }
 
-func (vc Vec[T]) FrontPtr() *T {
-	return &vc[0]
+func (vc Vec[T]) Back() (opt OptionalPtr[T]) {
+	if len(vc) != 0 {
+		opt.Set(&vc[len(vc)-1])
+	}
+
+	return
 }
 
-func (vc Vec[T]) Back() T {
-	return vc[vc.Len()-1]
-}
-
-func (vc Vec[T]) BackPtr() *T {
-	return &vc[vc.Len()-1]
-}
-
-func (vc *Vec[T]) PopBack() (e T) {
-	if len(*vc) > 0 {
-		e = (*vc)[len(*vc)-1]
+func (vc *Vec[T]) PopBack() (opt OptionalPtr[T]) {
+	if len(*vc) != 0 {
+		opt.Set(&(*vc)[len(*vc)-1])
 		*vc = (*vc)[:len(*vc)-1]
 	}
 
 	return
 }
 
-func (vc *Vec[T]) PopFront() (e T) {
-	if len(*vc) > 0 {
-		e = (*vc)[0]
+func (vc *Vec[T]) PopFront() (opt OptionalPtr[T]) {
+	if len(*vc) != 0 {
+		opt.Set(&(*vc)[0])
 		*vc = append((*vc)[:0], (*vc)[1:]...)
 	}
 

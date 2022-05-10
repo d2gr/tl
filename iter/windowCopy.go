@@ -1,9 +1,11 @@
 package iter
 
+import "github.com/d2gr/tl"
+
 type iterWindowCopy[T any] struct {
 	size  int
 	win   []T
-	inner Iter[T]
+	inner tl.Iter[T]
 }
 
 func (iter *iterWindowCopy[T]) Next() bool {
@@ -30,7 +32,7 @@ func (iter *iterWindowCopy[T]) GetPtr() *[]T {
 	return &iter.win
 }
 
-func WindowCopy[T any](inner Iter[T], n int) Iter[[]T] {
+func WindowCopy[T any](inner tl.Iter[T], n int) tl.Iter[[]T] {
 	return &iterWindowCopy[T]{
 		inner: inner,
 		win:   make([]T, 0, n),

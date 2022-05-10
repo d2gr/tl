@@ -1,5 +1,7 @@
 package iter
 
+import "github.com/d2gr/tl"
+
 type iterSlice[T any] struct {
 	vs      []T
 	current *T
@@ -25,13 +27,13 @@ func (iter *iterSlice[T]) GetPtr() *T {
 	return iter.current
 }
 
-func Slice[T any](vs []T) Iter[T] {
+func Slice[T any](vs []T) tl.Iter[T] {
 	return &iterSlice[T]{
 		vs: vs,
 	}
 }
 
-func AppendTo[T any](vs []T, iter Iter[T]) []T {
+func AppendTo[T any](vs []T, iter tl.Iter[T]) []T {
 	for iter.Next() {
 		vs = append(vs, iter.Get())
 	}
@@ -39,7 +41,7 @@ func AppendTo[T any](vs []T, iter Iter[T]) []T {
 	return vs
 }
 
-func ToSlice[T any](iter Iter[T]) []T {
+func ToSlice[T any](iter tl.Iter[T]) []T {
 	newSlice := make([]T, 0)
 
 	for iter.Next() {

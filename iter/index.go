@@ -2,7 +2,7 @@ package iter
 
 import "github.com/d2gr/tl"
 
-func Index[T any](iter Iter[T], cmpFn tl.CompareFunc[T]) int {
+func Index[T any](iter tl.Iter[T], cmpFn tl.CompareFunc[T]) int {
 	i := 0
 	for ; iter.Next(); i++ {
 		if cmpFn(iter.Get()) {
@@ -13,7 +13,7 @@ func Index[T any](iter Iter[T], cmpFn tl.CompareFunc[T]) int {
 	return -1
 }
 
-func Search[T any](iter Iter[T], cmpFn tl.CompareFunc[T]) Iter[T] {
+func Search[T any](iter tl.Iter[T], cmpFn tl.CompareFunc[T]) tl.Iter[T] {
 	for iter.Next() {
 		if cmpFn(iter.Get()) {
 			return iter

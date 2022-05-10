@@ -1,7 +1,9 @@
 package iter
 
+import "github.com/d2gr/tl"
+
 type iterFlatten[T any] struct {
-	inner   Iter[[]T]
+	inner   tl.Iter[[]T]
 	current T
 	vs      []T
 }
@@ -29,7 +31,7 @@ func (iter *iterFlatten[T]) GetPtr() *T {
 	return &iter.current
 }
 
-func Flatten[T any](inner Iter[[]T]) Iter[T] {
+func Flatten[T any](inner tl.Iter[[]T]) tl.Iter[T] {
 	return &iterFlatten[T]{
 		inner: inner,
 	}
