@@ -7,7 +7,8 @@ type listElement[T any] struct {
 }
 
 type List[T any] struct {
-	root listElement[T]
+	prev *listElement[T]
+	next *listElement[T]
 	size int
 }
 
@@ -18,54 +19,47 @@ func (list *List[T]) Size() int {
 func (list *List[T]) PushBack(v T) {
 	e := &listElement[T]{
 		value: v,
-		prev:  list.root.prev,
-		next:  &list.root,
+		prev:  list.prev,
 	}
 
-	if list.root.prev != nil {
-		list.root.prev.next = e
+	if list.prev != nil {
+		list.prev.next = e
 	} else {
-		list.root.next = e
+		list.next = e
 	}
 
-	if e.prev == nil {
-		e.prev = &list.root
-	}
-
-	list.root.prev = e
+	list.prev = e
 	list.size++
 }
 
 func (list *List[T]) PushFront(v T) {
 	e := &listElement[T]{
 		value: v,
-		prev:  &list.root,
-		next:  list.root.next,
+		next:  list.next,
 	}
 
-	if list.root.next != nil {
-		list.root.next.prev = e
+	if list.next != nil {
+		list.next.prev = e
 	} else {
-		list.root.prev = e
+		list.prev = e
 	}
 
-	if e.next == nil {
-		e.next = &list.root
-	}
-
-	list.root.next = e
+	list.next = e
 	list.size++
 }
 
 func (list *List[T]) PopFront() (opt OptionalPtr[T]) {
-	if list.root.next != nil {
-		opt.Set(&list.root.next.value)
+	if list.next != nil {
+		opt.Set(&list.next.value)
 
-		list.root.next = list.root.next.next
+		list.next = list.next.next
+		if list.next != nil {
+			list.next.prev = nil
+		}
 
 		list.size--
 		if list.size == 0 {
-			list.root.prev = nil
+			list.prev = nil
 		}
 	}
 
@@ -73,14 +67,17 @@ func (list *List[T]) PopFront() (opt OptionalPtr[T]) {
 }
 
 func (list *List[T]) PopBack() (opt OptionalPtr[T]) {
-	if list.root.prev != nil {
-		opt.Set(&list.root.prev.value)
+	if list.prev != nil {
+		opt.Set(&list.prev.value)
 
-		list.root.prev = list.root.prev.prev
+		list.prev = list.prev.prev
+		if list.prev != nil {
+			list.prev.next = nil
+		}
 
 		list.size--
 		if list.size == 0 {
-			list.root.next = nil
+			list.next = nil
 		}
 	}
 
@@ -88,59 +85,63 @@ func (list *List[T]) PopBack() (opt OptionalPtr[T]) {
 }
 
 func (list *List[T]) Reset() {
-	list.root.next = nil
-	list.root.prev = nil
+	list.next = nil
+	list.prev = nil
 	list.size = 0
 }
 
 type forwardIterList[T any] struct {
-	root *listElement[T]
-	next *listElement[T]
+	next    *listElement[T]
+	current *listElement[T]
 }
 
 func (list *List[T]) ForwardIter() Iter[T] {
 	return &forwardIterList[T]{
-		root: &list.root,
-		next: &list.root,
+		next: list.next,
 	}
 }
 
 func (iter *forwardIterList[T]) Next() bool {
-	cond := iter.root != iter.next.next && iter.next.next != nil
-	iter.next = iter.next.next
-	return cond
+	iter.current = iter.next
+	if iter.next != nil {
+		iter.next = iter.next.next
+	}
+
+	return iter.current != nil
 }
 
 func (iter *forwardIterList[T]) Get() T {
-	return iter.next.value
+	return iter.current.value
 }
 
 func (iter *forwardIterList[T]) GetPtr() *T {
-	return &iter.next.value
+	return &iter.current.value
 }
 
 type reverseIterList[T any] struct {
-	root *listElement[T]
-	next *listElement[T]
+	prev    *listElement[T]
+	current *listElement[T]
 }
 
 func (list *List[T]) ReverseIter() Iter[T] {
 	return &reverseIterList[T]{
-		root: &list.root,
-		next: &list.root,
+		prev: list.prev,
 	}
 }
 
 func (iter *reverseIterList[T]) Next() bool {
-	cond := iter.root != iter.next.prev && iter.next.prev != nil
-	iter.next = iter.next.prev
-	return cond
+	iter.current = iter.prev
+	if iter.prev != nil {
+		iter.prev = iter.prev.prev
+	}
+
+	return iter.current != nil
 }
 
 func (iter *reverseIterList[T]) Get() T {
-	return iter.next.value
+	return iter.current.value
 }
 
 func (iter *reverseIterList[T]) GetPtr() *T {
-	return &iter.next.value
+	return &iter.current.value
 }

@@ -52,6 +52,10 @@ func TestList(t *testing.T) {
 			}
 		}
 
+		if iter.Next() {
+			t.Fatal("unexpected")
+		}
+
 		list.Reset()
 	}
 }
