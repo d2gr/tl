@@ -48,6 +48,22 @@ func (list *List[T]) PushFront(v T) {
 	list.size++
 }
 
+func (list *List[T]) Front() (opt OptionalPtr[T]) {
+	if list.next != nil {
+		opt.Set(&list.next.value)
+	}
+
+	return
+}
+
+func (list *List[T]) Back() (opt OptionalPtr[T]) {
+	if list.prev != nil {
+		opt.Set(&list.prev.value)
+	}
+
+	return
+}
+
 func (list *List[T]) PopFront() (opt OptionalPtr[T]) {
 	if list.next != nil {
 		opt.Set(&list.next.value)
