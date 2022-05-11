@@ -1,5 +1,7 @@
 package tl
 
+import "fmt"
+
 type listElement[T any] struct {
 	value T
 	prev  *listElement[T]
@@ -83,13 +85,13 @@ func (list *List[T]) Back() (opt OptionalPtr[T]) {
 	return
 }
 
-// func (list *List[T]) Print() {
-// 	fmt.Printf("%p - %d %p %p\n", &list.root, list.size, list.root.prev, list.root.next)
-// 	for next := list.root.next; next != nil && next != &list.root; next = next.next {
-// 		fmt.Printf("%p = %p - %p\n", next, next.prev, next.next)
-// 	}
-// 	println("-------")
-// }
+func Print[T any](list *listElement[T]) {
+	fmt.Printf("%p - %p %p\n", list, list.prev, list.next)
+	for next := list.next; next != nil && next != list; next = next.next {
+		fmt.Printf("%p (%v) = %p - %p\n", next, next.value, next.prev, next.next)
+	}
+	println("-------")
+}
 
 func (list *List[T]) PopFront() (opt OptionalPtr[T]) {
 	if list.root.next != nil {
@@ -134,20 +136,26 @@ type forwardIterList[T any] struct {
 	current *listElement[T]
 }
 
-func (list *List[T]) ForwardIter() Iter[T] {
+func (list *List[T]) ForwardIter() IterDrop[T] {
 	return &forwardIterList[T]{
 		root: &list.root,
 		next: list.root.next,
 	}
 }
 
+func (iter *forwardIterList[T]) Drop() {
+	iter.current.Drop()
+}
+
 func (iter *forwardIterList[T]) Next() bool {
 	iter.current = iter.next
-	if iter.next != nil {
+
+	if iter.next != nil && iter.next != iter.root {
 		iter.next = iter.next.next
+		return true
 	}
 
-	return iter.current != nil && iter.current != iter.root
+	return false
 }
 
 func (iter *forwardIterList[T]) Get() T {
@@ -164,20 +172,26 @@ type reverseIterList[T any] struct {
 	current *listElement[T]
 }
 
-func (list *List[T]) ReverseIter() Iter[T] {
+func (list *List[T]) ReverseIter() IterDrop[T] {
 	return &reverseIterList[T]{
 		root: &list.root,
 		prev: list.root.prev,
 	}
 }
 
+func (iter *reverseIterList[T]) Drop() {
+	iter.current.Drop()
+}
+
 func (iter *reverseIterList[T]) Next() bool {
 	iter.current = iter.prev
-	if iter.prev != nil {
+
+	if iter.prev != nil && iter.current != iter.root {
 		iter.prev = iter.prev.prev
+		return true
 	}
 
-	return iter.current != nil && iter.current != iter.root
+	return false
 }
 
 func (iter *reverseIterList[T]) Get() T {
