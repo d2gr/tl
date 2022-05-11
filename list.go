@@ -6,9 +6,18 @@ type listElement[T any] struct {
 	next  *listElement[T]
 }
 
+func (e *listElement[T]) Drop() {
+	if e.prev != nil {
+		e.prev.next = e.next
+	}
+
+	if e.next != nil {
+		e.next.prev = e.prev
+	}
+}
+
 type List[T any] struct {
-	prev *listElement[T]
-	next *listElement[T]
+	root listElement[T]
 	size int
 }
 
@@ -19,63 +28,78 @@ func (list *List[T]) Size() int {
 func (list *List[T]) PushBack(v T) {
 	e := &listElement[T]{
 		value: v,
-		prev:  list.prev,
+		prev:  list.root.prev,
+		next:  &list.root,
 	}
 
-	if list.prev != nil {
-		list.prev.next = e
+	if e.prev == nil {
+		e.prev = &list.root
+	}
+
+	if list.root.prev != nil {
+		list.root.prev.next = e
 	} else {
-		list.next = e
+		list.root.next = e
 	}
 
-	list.prev = e
+	list.root.prev = e
 	list.size++
 }
 
 func (list *List[T]) PushFront(v T) {
 	e := &listElement[T]{
 		value: v,
-		next:  list.next,
+		next:  list.root.next,
+		prev:  &list.root,
 	}
 
-	if list.next != nil {
-		list.next.prev = e
+	if e.next == nil {
+		e.next = &list.root
+	}
+
+	if list.root.next != nil {
+		list.root.next.prev = e
 	} else {
-		list.prev = e
+		list.root.prev = e
 	}
 
-	list.next = e
+	list.root.next = e
 	list.size++
 }
 
 func (list *List[T]) Front() (opt OptionalPtr[T]) {
-	if list.next != nil {
-		opt.Set(&list.next.value)
+	if list.root.next != nil {
+		opt.Set(&list.root.next.value)
 	}
 
 	return
 }
 
 func (list *List[T]) Back() (opt OptionalPtr[T]) {
-	if list.prev != nil {
-		opt.Set(&list.prev.value)
+	if list.root.prev != nil {
+		opt.Set(&list.root.prev.value)
 	}
 
 	return
 }
 
-func (list *List[T]) PopFront() (opt OptionalPtr[T]) {
-	if list.next != nil {
-		opt.Set(&list.next.value)
+// func (list *List[T]) Print() {
+// 	fmt.Printf("%p - %d %p %p\n", &list.root, list.size, list.root.prev, list.root.next)
+// 	for next := list.root.next; next != nil && next != &list.root; next = next.next {
+// 		fmt.Printf("%p = %p - %p\n", next, next.prev, next.next)
+// 	}
+// 	println("-------")
+// }
 
-		list.next = list.next.next
-		if list.next != nil {
-			list.next.prev = nil
-		}
+func (list *List[T]) PopFront() (opt OptionalPtr[T]) {
+	if list.root.next != nil {
+		opt.Set(&list.root.next.value)
+
+		list.root.next.Drop()
 
 		list.size--
 		if list.size == 0 {
-			list.prev = nil
+			list.root.prev = nil
 		}
 	}
 
@@ -83,17 +107,15 @@ func (list *List[T]) PopFront() (opt OptionalPtr[T]) {
 }
 
 func (list *List[T]) PopBack() (opt OptionalPtr[T]) {
-	if list.prev != nil {
-		opt.Set(&list.prev.value)
+	if list.root.prev != nil {
+		opt.Set(&list.root.prev.value)
 
-		list.prev = list.prev.prev
-		if list.prev != nil {
-			list.prev.next = nil
-		}
+		list.root.prev.Drop()
+		// list.root.prev = list.root.prev.prev
 
 		list.size--
 		if list.size == 0 {
-			list.next = nil
+			list.root.next = nil
 		}
 	}
 
@@ -101,19 +123,21 @@ func (list *List[T]) PopBack() (opt OptionalPtr[T]) {
 }
 
 func (list *List[T]) Reset() {
-	list.next = nil
-	list.prev = nil
+	list.root.next = nil
+	list.root.prev = nil
 	list.size = 0
 }
 
 type forwardIterList[T any] struct {
+	root    *listElement[T]
 	next    *listElement[T]
 	current *listElement[T]
 }
 
 func (list *List[T]) ForwardIter() Iter[T] {
 	return &forwardIterList[T]{
-		next: list.next,
+		root: &list.root,
+		next: list.root.next,
 	}
 }
 
@@ -123,7 +147,7 @@ func (iter *forwardIterList[T]) Next() bool {
 		iter.next = iter.next.next
 	}
 
-	return iter.current != nil
+	return iter.current != nil && iter.current != iter.root
 }
 
 func (iter *forwardIterList[T]) Get() T {
@@ -135,13 +159,15 @@ func (iter *forwardIterList[T]) GetPtr() *T {
 }
 
 type reverseIterList[T any] struct {
+	root    *listElement[T]
 	prev    *listElement[T]
 	current *listElement[T]
 }
 
 func (list *List[T]) ReverseIter() Iter[T] {
 	return &reverseIterList[T]{
-		prev: list.prev,
+		root: &list.root,
+		prev: list.root.prev,
 	}
 }
 
@@ -151,7 +177,7 @@ func (iter *reverseIterList[T]) Next() bool {
 		iter.prev = iter.prev.prev
 	}
 
-	return iter.current != nil
+	return iter.current != nil && iter.current != iter.root
 }
 
 func (iter *reverseIterList[T]) Get() T {

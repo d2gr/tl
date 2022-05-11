@@ -81,6 +81,14 @@ func TestListPop(t *testing.T) {
 
 	{
 		list.PushBack(2)
+		list.PushFront(4)
+		list.PopFront()
+		list.PopBack()
+		list.PushBack(3)
+		list.PopFront()
+		list.PushFront(2)
+		list.PushFront(4)
+		list.PopBack()
 		list.PopFront()
 
 		iter = list.ForwardIter()
