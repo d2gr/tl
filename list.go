@@ -1,7 +1,5 @@
 package tl
 
-import "fmt"
-
 type listElement[T any] struct {
 	value T
 	prev  *listElement[T]
@@ -20,11 +18,6 @@ func (e *listElement[T]) Drop() {
 
 type List[T any] struct {
 	root listElement[T]
-	size int
-}
-
-func (list *List[T]) Size() int {
-	return list.size
 }
 
 func (list *List[T]) PushBack(v T) {
@@ -45,7 +38,6 @@ func (list *List[T]) PushBack(v T) {
 	}
 
 	list.root.prev = e
-	list.size++
 }
 
 func (list *List[T]) PushFront(v T) {
@@ -66,7 +58,6 @@ func (list *List[T]) PushFront(v T) {
 	}
 
 	list.root.next = e
-	list.size++
 }
 
 func (list *List[T]) Front() (opt OptionalPtr[T]) {
@@ -85,24 +76,19 @@ func (list *List[T]) Back() (opt OptionalPtr[T]) {
 	return
 }
 
-func Print[T any](list *listElement[T]) {
-	fmt.Printf("%p - %p %p\n", list, list.prev, list.next)
-	for next := list.next; next != nil && next != list; next = next.next {
-		fmt.Printf("%p (%v) = %p - %p\n", next, next.value, next.prev, next.next)
-	}
-	println("-------")
-}
+// func Print[T any](list *listElement[T]) {
+// 	fmt.Printf("%p - %p %p\n", list, list.prev, list.next)
+// 	for next := list.next; next != nil && next != list; next = next.next {
+// 		fmt.Printf("%p (%v) = %p - %p\n", next, next.value, next.prev, next.next)
+// 	}
+// 	println("-------")
+// }
 
 func (list *List[T]) PopFront() (opt OptionalPtr[T]) {
 	if list.root.next != nil {
 		opt.Set(&list.root.next.value)
 
 		list.root.next.Drop()
-
-		list.size--
-		if list.size == 0 {
-			list.root.prev = nil
-		}
 	}
 
 	return
@@ -113,12 +99,6 @@ func (list *List[T]) PopBack() (opt OptionalPtr[T]) {
 		opt.Set(&list.root.prev.value)
 
 		list.root.prev.Drop()
-		// list.root.prev = list.root.prev.prev
-
-		list.size--
-		if list.size == 0 {
-			list.root.next = nil
-		}
 	}
 
 	return
@@ -127,7 +107,6 @@ func (list *List[T]) PopBack() (opt OptionalPtr[T]) {
 func (list *List[T]) Reset() {
 	list.root.next = nil
 	list.root.prev = nil
-	list.size = 0
 }
 
 type iterList[T any] struct {
