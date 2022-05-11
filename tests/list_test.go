@@ -12,7 +12,7 @@ func TestList(t *testing.T) {
 
 	type expectedValue struct {
 		fn       func(int)
-		iter     func() tl.IterDrop[int]
+		forward  bool
 		expected []int
 	}
 
@@ -21,19 +21,19 @@ func TestList(t *testing.T) {
 	es := []expectedValue{
 		{
 			fn:       list.PushBack,
-			iter:     list.ForwardIter,
+			forward:  true,
 			expected: iter.ToSlice(iter.Range(0, 10, 1)),
 		}, {
 			fn:       list.PushFront,
-			iter:     list.ForwardIter,
+			forward:  true,
 			expected: iter.ToSlice(iter.Range(9, -1, -1)),
 		}, {
 			fn:       list.PushBack,
-			iter:     list.ReverseIter,
+			forward:  false,
 			expected: iter.ToSlice(iter.Range(9, -1, -1)),
 		}, {
 			fn:       list.PushFront,
-			iter:     list.ReverseIter,
+			forward:  false,
 			expected: iter.ToSlice(iter.Range(0, 10, 1)),
 		},
 	}
@@ -43,16 +43,22 @@ func TestList(t *testing.T) {
 			e.fn(v)
 		}
 
-		iter := e.iter()
+		iter := list.Iter()
+		next := iter.Next
+
+		if !e.forward {
+			next = iter.Back
+		}
+
 		for i := 0; i < len(e.expected); i++ {
-			iter.Next()
+			next()
 
 			if e.expected[i] != iter.Get() {
 				t.Fatalf("unexpected value on %d,%d: %d <> %d", idx, i, e.expected[i], iter.Get())
 			}
 		}
 
-		if iter.Next() {
+		if next() {
 			t.Fatal("unexpected")
 		}
 
@@ -65,16 +71,11 @@ func TestListPop(t *testing.T) {
 
 	type expectedValue struct {
 		fn       func(int)
-		iter     func() tl.Iter[int]
+		iter     func() tl.IterDropBidir[int]
 		expected []int
 	}
 
-	iter := list.ForwardIter()
-	if iter.Next() {
-		t.Fatal("unexpected")
-	}
-
-	iter = list.ReverseIter()
+	iter := list.Iter()
 	if iter.Next() {
 		t.Fatal("unexpected")
 	}
@@ -91,12 +92,7 @@ func TestListPop(t *testing.T) {
 		list.PopBack()
 		list.PopFront()
 
-		iter = list.ForwardIter()
-		if iter.Next() {
-			t.Fatal("unexpected")
-		}
-
-		iter = list.ReverseIter()
+		iter = list.Iter()
 		if iter.Next() {
 			t.Fatal("unexpected")
 		}
@@ -105,12 +101,7 @@ func TestListPop(t *testing.T) {
 		list.PushFront(2)
 		list.PopBack()
 
-		iter := list.ForwardIter()
-		if iter.Next() {
-			t.Fatal("unexpected")
-		}
-
-		iter = list.ReverseIter()
+		iter := list.Iter()
 		if iter.Next() {
 			t.Fatal("unexpected")
 		}
@@ -126,17 +117,17 @@ func TestIterDrop(t *testing.T) {
 		list.PushBack(v)
 	}
 
-	it := list.ForwardIter()
+	it := list.Iter()
 
 	it.Next()
 	values = values[1:]
 
 	for it.Next() {
-		it.Drop()
-
 		if it.Get() != values[0] {
 			t.Fatalf("got %d, expected %d", it.Get(), values[0])
 		}
+
+		it.Drop()
 
 		values = values[1:]
 	}
@@ -161,17 +152,17 @@ func TestIterDropReverse(t *testing.T) {
 
 	values = iter.ToSlice(iter.Range(10, 0, -1))
 
-	it := list.ReverseIter()
+	it := list.Iter()
 
-	it.Next()
+	it.Back()
 	values = values[1:]
 
-	for it.Next() {
-		it.Drop()
-
+	for it.Back() {
 		if it.Get() != values[0] {
 			t.Fatalf("got %d, expected %d", it.Get(), values[0])
 		}
+
+		it.Drop()
 
 		values = values[1:]
 	}
@@ -180,7 +171,7 @@ func TestIterDropReverse(t *testing.T) {
 		t.Fatalf("unexpected: %d", len(values))
 	}
 
-	if it.Next() {
+	if it.Back() {
 		t.Fatalf("unexpected: %d", it.Get())
 	}
 }

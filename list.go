@@ -130,74 +130,55 @@ func (list *List[T]) Reset() {
 	list.size = 0
 }
 
-type forwardIterList[T any] struct {
+type iterList[T any] struct {
 	root    *listElement[T]
-	next    *listElement[T]
 	current *listElement[T]
+	next    *listElement[T]
+	prev    *listElement[T]
 }
 
-func (list *List[T]) ForwardIter() IterDrop[T] {
-	return &forwardIterList[T]{
+func (list *List[T]) Iter() IterDropBidir[T] {
+	return &iterList[T]{
 		root: &list.root,
 		next: list.root.next,
-	}
-}
-
-func (iter *forwardIterList[T]) Drop() {
-	iter.current.Drop()
-}
-
-func (iter *forwardIterList[T]) Next() bool {
-	iter.current = iter.next
-
-	if iter.next != nil && iter.next != iter.root {
-		iter.next = iter.next.next
-		return true
-	}
-
-	return false
-}
-
-func (iter *forwardIterList[T]) Get() T {
-	return iter.current.value
-}
-
-func (iter *forwardIterList[T]) GetPtr() *T {
-	return &iter.current.value
-}
-
-type reverseIterList[T any] struct {
-	root    *listElement[T]
-	prev    *listElement[T]
-	current *listElement[T]
-}
-
-func (list *List[T]) ReverseIter() IterDrop[T] {
-	return &reverseIterList[T]{
-		root: &list.root,
 		prev: list.root.prev,
 	}
 }
 
-func (iter *reverseIterList[T]) Drop() {
+func (iter *iterList[T]) Drop() {
 	iter.current.Drop()
 }
 
-func (iter *reverseIterList[T]) Next() bool {
+func (iter *iterList[T]) Back() bool {
 	iter.current = iter.prev
 
 	if iter.prev != nil && iter.current != iter.root {
+		iter.next = iter.prev
 		iter.prev = iter.prev.prev
+
 		return true
 	}
 
 	return false
 }
 
-func (iter *reverseIterList[T]) Get() T {
+func (iter *iterList[T]) Next() bool {
+	iter.current = iter.next
+
+	if iter.next != nil && iter.current != iter.root {
+		iter.prev = iter.next
+		iter.next = iter.next.next
+
+		return true
+	}
+
+	return false
+}
+
+func (iter *iterList[T]) Get() T {
 	return iter.current.value
 }
 
-func (iter *reverseIterList[T]) GetPtr() *T {
+func (iter *iterList[T]) GetPtr() *T {
 	return &iter.current.value
 }
