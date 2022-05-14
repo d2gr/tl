@@ -11,7 +11,7 @@ func TestList(t *testing.T) {
 	var list tl.List[int]
 
 	type expectedValue struct {
-		fn       func(int)
+		fn       func(int) *tl.ListElement[int]
 		forward  bool
 		expected []int
 	}
@@ -138,6 +138,37 @@ func TestIterDrop(t *testing.T) {
 
 	if it.Next() {
 		t.Fatalf("unexpected: %d", it.Get())
+	}
+}
+
+func TestPushDrop(t *testing.T) {
+	var list tl.List[int]
+
+	values := iter.ToSlice(iter.Range(1, 11, 1))
+
+	vars := make([]*tl.ListElement[int], 0)
+
+	for _, v := range values {
+		vars = append(vars, list.PushBack(v))
+	}
+
+	for len(vars) != 0 {
+		if vars[0].Get() != values[0] {
+			t.Fatalf("got %d, expected %d", vars[0].Get(), values[0])
+		}
+
+		vars[0].Drop()
+
+		values = values[1:]
+		vars = vars[1:]
+	}
+
+	if len(values) != 0 {
+		t.Fatalf("unexpected: %d", len(values))
+	}
+
+	if list.Iter().Next() {
+		t.Fatal("unexpected")
 	}
 }
 

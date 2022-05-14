@@ -1,12 +1,20 @@
 package tl
 
-type listElement[T any] struct {
+type ListElement[T any] struct {
 	value T
-	prev  *listElement[T]
-	next  *listElement[T]
+	prev  *ListElement[T]
+	next  *ListElement[T]
 }
 
-func (e *listElement[T]) Drop() {
+func (e *ListElement[T]) Get() T {
+	return e.value
+}
+
+func (e *ListElement[T]) GetPtr() *T {
+	return &e.value
+}
+
+func (e *ListElement[T]) Drop() {
 	if e.prev != nil {
 		e.prev.next = e.next
 	}
@@ -17,11 +25,11 @@ func (e *listElement[T]) Drop() {
 }
 
 type List[T any] struct {
-	root listElement[T]
+	root ListElement[T]
 }
 
-func (list *List[T]) PushBack(v T) {
-	e := &listElement[T]{
+func (list *List[T]) PushBack(v T) *ListElement[T] {
+	e := &ListElement[T]{
 		value: v,
 		prev:  list.root.prev,
 		next:  &list.root,
@@ -38,10 +46,12 @@ func (list *List[T]) PushBack(v T) {
 	}
 
 	list.root.prev = e
+
+	return e
 }
 
-func (list *List[T]) PushFront(v T) {
-	e := &listElement[T]{
+func (list *List[T]) PushFront(v T) *ListElement[T] {
+	e := &ListElement[T]{
 		value: v,
 		next:  list.root.next,
 		prev:  &list.root,
@@ -58,6 +68,8 @@ func (list *List[T]) PushFront(v T) {
 	}
 
 	list.root.next = e
+
+	return e
 }
 
 func (list *List[T]) Front() (opt OptionalPtr[T]) {
@@ -110,10 +122,10 @@ func (list *List[T]) Reset() {
 }
 
 type iterList[T any] struct {
-	root    *listElement[T]
-	current *listElement[T]
-	next    *listElement[T]
-	prev    *listElement[T]
+	root    *ListElement[T]
+	current *ListElement[T]
+	next    *ListElement[T]
+	prev    *ListElement[T]
 }
 
 func (list *List[T]) Iter() IterDropBidir[T] {
