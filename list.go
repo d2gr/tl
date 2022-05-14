@@ -1,9 +1,9 @@
 package tl
 
 type ListElement[T any] struct {
-	value T
-	prev  *ListElement[T]
-	next  *ListElement[T]
+	value      T
+	prev, next *ListElement[T]
+	list       *List[T]
 }
 
 func (e *ListElement[T]) Get() T {
@@ -22,10 +22,17 @@ func (e *ListElement[T]) Drop() {
 	if e.next != nil {
 		e.next.prev = e.prev
 	}
+
+	e.list.size--
 }
 
 type List[T any] struct {
 	root ListElement[T]
+	size int
+}
+
+func (list *List[T]) Size() int {
+	return list.size
 }
 
 func (list *List[T]) PushBack(v T) *ListElement[T] {
@@ -33,6 +40,7 @@ func (list *List[T]) PushBack(v T) *ListElement[T] {
 		value: v,
 		prev:  list.root.prev,
 		next:  &list.root,
+		list:  list,
 	}
 
 	if e.prev == nil {
@@ -46,6 +54,8 @@ func (list *List[T]) PushBack(v T) *ListElement[T] {
 	}
 
 	list.root.prev = e
+
+	list.size++
 
 	return e
 }
@@ -68,6 +78,8 @@ func (list *List[T]) PushFront(v T) *ListElement[T] {
 	}
 
 	list.root.next = e
+
+	list.size++
 
 	return e
 }
@@ -122,10 +134,9 @@ func (list *List[T]) Reset() {
 }
 
 type iterList[T any] struct {
-	root    *ListElement[T]
-	current *ListElement[T]
-	next    *ListElement[T]
-	prev    *ListElement[T]
+	root       *ListElement[T]
+	current    *ListElement[T]
+	prev, next *ListElement[T]
 }
 
 func (list *List[T]) Iter() IterDropBidir[T] {

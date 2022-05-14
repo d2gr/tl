@@ -139,6 +139,10 @@ func TestIterDrop(t *testing.T) {
 	if it.Next() {
 		t.Fatalf("unexpected: %d", it.Get())
 	}
+
+	if list.Size() != 1 {
+		t.Fatalf("Unexpected: %d", list.Size())
+	}
 }
 
 func TestPushDrop(t *testing.T) {
@@ -169,6 +173,10 @@ func TestPushDrop(t *testing.T) {
 
 	if list.Iter().Next() {
 		t.Fatal("unexpected")
+	}
+
+	if list.Size() != 0 {
+		t.Fatalf("Unexpected: %d", list.Size())
 	}
 }
 
@@ -204,5 +212,9 @@ func TestIterDropReverse(t *testing.T) {
 
 	if it.Back() {
 		t.Fatalf("unexpected: %d", it.Get())
+	}
+
+	if list.Size() != 1 {
+		t.Fatalf("Unexpected: %d", list.Size())
 	}
 }
