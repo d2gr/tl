@@ -65,7 +65,7 @@ func (list *List[T]) PushFront(v T) *ListElement[T] {
 		value: v,
 		next:  list.root.next,
 		prev:  &list.root,
-		list: list,
+		list:  list,
 	}
 
 	if e.next == nil {

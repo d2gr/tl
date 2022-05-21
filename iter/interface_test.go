@@ -1,8 +1,8 @@
 package iter
 
 import (
-	"testing"
 	"github.com/d2gr/tl"
+	"testing"
 )
 
 func TestAdvance(t *testing.T) {
