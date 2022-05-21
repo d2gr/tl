@@ -18,6 +18,10 @@ func NewOptional[T any](v *T) (opt Optional[T]) {
 	return opt
 }
 
+func None[T any]() (opt Optional[T]) {
+	return opt
+}
+
 func (opt Optional[T]) From(v T) Optional[T] {
 	opt.Set(v)
 	return opt
