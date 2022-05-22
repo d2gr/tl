@@ -18,6 +18,12 @@ func TestAntiJoin(t *testing.T) {
 	if !reflect.DeepEqual(got, r) {
 		t.Fatalf("unexpected: %v <> %v", r, got)
 	}
+
+	got = tl.AntiJoin(b, []int{})
+
+	if !reflect.DeepEqual(got, b) {
+		t.Fatalf("unexpected: %v <> %v", r, got)
+	}
 }
 
 func TestJoin(t *testing.T) {

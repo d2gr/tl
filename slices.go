@@ -108,13 +108,15 @@ func AntiJoin[T comparable](a, b []T) []T {
 	})
 }
 
-func MergeFn[T any](a, b []T, cmpFn func(a, b T) bool) (r []T) {
+func MergeFn[T any](cmpFn func(a, b T) bool, a []T, more ...[]T) (r []T) {
 	r = append(r, a...)
-	for i := range b {
-		if !ContainsFn(a, func(e T) bool {
-			return cmpFn(e, b[i])
-		}) {
-			r = append(r, b[i])
+	for _, b := range more {
+		for i := range b {
+			if !ContainsFn(a, func(e T) bool {
+				return cmpFn(e, b[i])
+			}) {
+				r = append(r, b[i])
+			}
 		}
 	}
 
@@ -122,7 +124,7 @@ func MergeFn[T any](a, b []T, cmpFn func(a, b T) bool) (r []T) {
 }
 
 func Merge[T comparable](a, b []T) (r []T) {
-	return MergeFn(a, b, func(a, b T) bool {
+	return MergeFn(func(a, b T) bool {
 		return a == b
-	})
+	}, a, b)
 }
