@@ -71,3 +71,58 @@ func Delete[T comparable](set []T, value T) []T {
 
 	return set
 }
+
+func JoinFn[T any](a, b []T, cmpFn func(a, b T) bool) (r []T) {
+	for i := range a {
+		if ContainsFn(b, func(e T) bool {
+			return cmpFn(e, a[i])
+		}) {
+			r = append(r, a[i])
+		}
+	}
+
+	return r
+}
+
+func Join[T comparable](a, b []T) []T {
+	return JoinFn(a, b, func(a, b T) bool {
+		return a == b
+	})
+}
+
+func AntiJoinFn[T any](a, b []T, cmpFn func(a, b T) bool) (r []T) {
+	for i := range a {
+		if !ContainsFn(b, func(e T) bool {
+			return cmpFn(e, a[i])
+		}) {
+			r = append(r, a[i])
+		}
+	}
+
+	return r
+}
+
+func AntiJoin[T comparable](a, b []T) []T {
+	return AntiJoinFn(a, b, func(a, b T) bool {
+		return a == b
+	})
+}
+
+func MergeFn[T any](a, b []T, cmpFn func(a, b T) bool) (r []T) {
+	r = append(r, a...)
+	for i := range b {
+		if !ContainsFn(a, func(e T) bool {
+			return cmpFn(e, b[i])
+		}) {
+			r = append(r, b[i])
+		}
+	}
+
+	return
+}
+
+func Merge[T comparable](a, b []T) (r []T) {
+	return MergeFn(a, b, func(a, b T) bool {
+		return a == b
+	})
+}
