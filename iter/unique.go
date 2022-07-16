@@ -42,3 +42,10 @@ func Unique[T comparable](inner tl.Iter[T]) tl.Iter[T] {
 		return a == b
 	})
 }
+
+func Get[T any](iter tl.Iter[T]) T {
+	for iter.Next() {
+	}
+
+	return iter.Get()
+}

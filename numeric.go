@@ -27,3 +27,20 @@ func Min[T constraints.Ordered](a, b T) (r T) {
 
 	return
 }
+
+func Sum[T constraints.Integer | constraints.Float](a ...T) (r T) {
+	for i := range a {
+		r += a[i]
+	}
+
+	return
+}
+
+func Avg[T constraints.Integer | constraints.Float](a ...T) (r T) {
+	sum := Sum(a...)
+	if sum != 0 {
+		sum /= T(len(a))
+	}
+
+	return sum
+}
